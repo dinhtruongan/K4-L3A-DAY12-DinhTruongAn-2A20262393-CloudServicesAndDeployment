@@ -120,6 +120,13 @@ class TestStructuredLogging:
 
 
 class TestHealthEndpoint:
+    def test_trang_chu_co_huong_dan_api(self, client):
+        response = client.get("/")
+        assert response.status_code == 200
+        assert "Day 12" in response.text
+        assert "/docs" in response.text
+        assert "X-API-Key" in response.text
+
     def test_health_tra_ve_200(self, client):
         response = client.get("/health")
         assert response.status_code == 200

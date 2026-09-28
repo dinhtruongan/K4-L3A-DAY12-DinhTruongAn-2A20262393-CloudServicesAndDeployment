@@ -17,7 +17,7 @@ from contextlib import asynccontextmanager
 from functools import lru_cache
 
 from fastapi import Depends, FastAPI
-from fastapi.responses import JSONResponse
+from fastapi.responses import HTMLResponse, JSONResponse
 from pydantic import BaseModel, Field
 
 from utils.mock_llm import ask_llm
@@ -68,6 +68,50 @@ async def lifespan(_app: FastAPI):
 
 
 app = FastAPI(title="Day 12 Production Agent", version=SERVICE_VERSION, lifespan=lifespan)
+
+
+@app.get("/", response_class=HTMLResponse, include_in_schema=False)
+def index():
+    """Small public landing page so opening the deployed URL is useful."""
+    return """<!doctype html>
+<html lang="vi">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#101827">
+  <title>Day 12 AI Agent API</title>
+  <style>
+    :root { color-scheme: dark; font-family: Inter, ui-sans-serif, system-ui, sans-serif; }
+    * { box-sizing: border-box; }
+    body { margin: 0; min-height: 100vh; display: grid; place-items: center; padding: 24px; color: #e5edf8; background: radial-gradient(ellipse at 15% 10%, #183b53 0, transparent 45%), #101827; }
+    main { width: min(720px, 100%); padding: clamp(28px, 6vw, 52px); border: 1px solid #2c4057; border-radius: 24px; background: #142235eF; box-shadow: 0 24px 80px #0006; }
+    .tag { display: inline-block; padding: 7px 11px; border: 1px solid #275e55; border-radius: 999px; color: #7ee7bd; background: #12352e; font-size: 13px; }
+    h1 { margin: 22px 0 12px; font-size: clamp(34px, 7vw, 56px); letter-spacing: -.04em; line-height: 1.03; }
+    p { color: #adbed2; font-size: 17px; line-height: 1.65; }
+    nav { display: flex; flex-wrap: wrap; gap: 12px; margin: 28px 0; }
+    a { padding: 12px 16px; border: 1px solid #39536f; border-radius: 11px; color: #dff3ff; text-decoration: none; background: #1b3047; }
+    a.primary { border-color: #62d7b0; color: #09251e; background: #71e4bc; font-weight: 700; }
+    a:hover { filter: brightness(1.12); }
+    code { color: #9fe6cd; font-family: ui-monospace, SFMono-Regular, Consolas, monospace; }
+    .hint { padding: 14px 16px; border-left: 3px solid #71e4bc; border-radius: 4px 10px 10px 4px; background: #1a2c40; font-size: 14px; }
+    footer { margin-top: 28px; color: #8296ad; font-size: 13px; }
+  </style>
+</head>
+<body>
+  <main>
+    <span class="tag">● API đang hoạt động</span>
+    <h1>Day 12<br>AI Agent API</h1>
+    <p>Dịch vụ AI Agent demo chạy mock LLM offline, có xác thực API key, giới hạn tốc độ, kiểm soát chi phí và Redis dùng chung.</p>
+    <nav>
+      <a class="primary" href="/docs">Mở API Docs →</a>
+      <a href="/health">Health</a>
+      <a href="/ready">Readiness</a>
+    </nav>
+    <p class="hint">Để gọi <code>POST /ask</code>, gửi header <code>X-API-Key</code> cùng câu hỏi JSON. API key được giữ bí mật trong cấu hình dịch vụ; không chia sẻ hoặc dán key lên trang web.</p>
+    <footer>Day 12 · Cloud Services and Deployment · FastAPI + Redis</footer>
+  </main>
+</body>
+</html>"""
 
 
 class AskRequest(BaseModel):

@@ -13,6 +13,7 @@
 | Mục | Nội dung |
 |---|---|
 | Public URL | https://day12-agent-7l68.onrender.com |
+| Landing page | https://day12-agent-7l68.onrender.com/ (Vietnamese guide; API docs at `/docs`) |
 | Platform | Render Blueprint |
 | Ngày deploy đầu tiên | 2026-09-28 |
 | Web service | `day12-agent` — Docker, Free, Oregon |
