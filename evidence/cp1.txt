@@ -1,0 +1,30 @@
+============================= test session starts =============================
+platform win32 -- Python 3.13.15, pytest-8.4.2, pluggy-1.6.0 -- C:\Users\Administrator\AppData\Local\Programs\Python\Python313\python.exe
+cachedir: .pytest_cache
+rootdir: C:\K4-L3A-DinhTruongAn-2A20262393-Cloud-Service-And-Deployment
+plugins: anyio-4.15.1, langsmith-0.13.0, asyncio-1.4.0
+asyncio: mode=Mode.STRICT, debug=False, asyncio_default_fixture_loop_scope=None, asyncio_default_test_loop_scope=function
+collecting ... collected 13 items
+
+tests/test_cp1.py::TestConfig::test_settings_co_du_cac_truong PASSED     [  7%]
+tests/test_cp1.py::TestConfig::test_doc_gia_tri_tu_bien_moi_truong PASSED [ 15%]
+tests/test_cp1.py::TestConfig::test_gia_tri_mac_dinh_hop_ly PASSED       [ 23%]
+tests/test_cp1.py::TestConfig::test_thieu_api_key_thi_fail_fast PASSED   [ 30%]
+tests/test_cp1.py::TestConfig::test_khong_hardcode_secret PASSED         [ 38%]
+tests/test_cp1.py::TestStructuredLogging::test_log_event_tra_ve_json_hop_le PASSED [ 46%]
+tests/test_cp1.py::TestStructuredLogging::test_log_event_gan_them_truong_tuy_y PASSED [ 53%]
+tests/test_cp1.py::TestStructuredLogging::test_level_luon_viet_thuong PASSED [ 61%]
+tests/test_cp1.py::TestStructuredLogging::test_log_ra_stdout_dung_mot_dong PASSED [ 69%]
+tests/test_cp1.py::TestStructuredLogging::test_timestamp_dung_dinh_dang_iso PASSED [ 76%]
+tests/test_cp1.py::TestHealthEndpoint::test_health_tra_ve_200 PASSED     [ 84%]
+tests/test_cp1.py::TestHealthEndpoint::test_health_khong_can_api_key PASSED [ 92%]
+tests/test_cp1.py::TestHealthEndpoint::test_health_khong_phu_thuoc_dependency_nao PASSED [100%]
+
+============================== warnings summary ===============================
+tests/test_cp1.py::TestHealthEndpoint::test_health_tra_ve_200
+  C:\Users\Administrator\AppData\Local\Programs\Python\Python313\Lib\site-packages\starlette\testclient.py:53: DeprecationWarning: The anyio.abc.BlockingPortal alias is deprecated, use anyio.from_thread.BlockingPortal instead.
+    _PortalFactoryType = Callable[[], AbstractContextManager[anyio.abc.BlockingPortal]]
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+- generated xml file: C:\K4-L3A-DinhTruongAn-2A20262393-Cloud-Service-And-Deployment\evidence\cp1.xml -
+======================== 13 passed, 1 warning in 1.47s ========================

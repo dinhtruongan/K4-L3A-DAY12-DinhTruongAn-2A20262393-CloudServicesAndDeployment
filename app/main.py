@@ -57,10 +57,14 @@ def get_cost_guard() -> CostGuard:
 @asynccontextmanager
 async def lifespan(_app: FastAPI):
     """CHO SẴN — chạy lúc app khởi động và lúc tắt."""
+    get_settings()  # Validate required config before accepting requests.
+    lifecycle.shutting_down = False
     lifecycle.install()
     log_event("service_started", service=SERVICE_NAME, version=SERVICE_VERSION)
-    yield
-    log_event("service_stopped", service=SERVICE_NAME)
+    try:
+        yield
+    finally:
+        log_event("service_stopped", service=SERVICE_NAME)
 
 
 app = FastAPI(title="Day 12 Production Agent", version=SERVICE_VERSION, lifespan=lifespan)
@@ -87,7 +91,9 @@ def health():
     lời câu hỏi "có cần restart container này không?". Nếu nó phụ thuộc
     Redis, Redis chết một nhịp là cả cụm container bị restart theo.
     """
-    raise NotImplementedError("TODO (CP1/CP4): cài đặt /health")
+    if lifecycle.shutting_down:
+        return JSONResponse(status_code=503, content={"status": "shutting_down"})
+    return {"status": "ok", "service": SERVICE_NAME, "version": SERVICE_VERSION}
 
 
 @app.get("/ready")
