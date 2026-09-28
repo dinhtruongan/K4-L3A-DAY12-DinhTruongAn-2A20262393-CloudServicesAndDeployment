@@ -1,101 +1,65 @@
-# Thông Tin Deploy — Checkpoint 5
+# Thông tin triển khai — Checkpoint 5
 
-> Điền file này sau khi deploy xong. `pytest tests/test_cp5.py` đọc file này
-> để tìm địa chỉ service của bạn và gọi thử.
->
-> **Chỉ ghi TÊN biến môi trường, tuyệt đối không dán giá trị API key vào đây.**
-> Repo này công khai — dán khóa vào là mất khóa.
-
-## Thông Tin Học Viên
+## Thông tin học viên
 
 | Mục | Nội dung |
-|-----|----------|
-| Họ và tên | (điền họ tên) |
-| Mã học viên | (điền mã học viên) |
-| Repo | (điền link repo K4-L3A-DAY12-HoVaTen-MSSV-CloudServicesAndDeployment) |
+|---|---|
+| Họ và tên | Dinh Truong An |
+| Mã học viên | 2A20262393 |
+| Repository | https://github.com/dinhtruongan/K4-L3A-DAY12-DinhTruongAn-2A20262393-CloudServicesAndDeployment |
 
 ## Service
 
 | Mục | Nội dung |
-|-----|----------|
-| Public URL | https://TODO-thay-bang-url-that.up.railway.app |
-| Platform | Railway / Render / Cloud Run — (điền platform bạn dùng) |
-| Ngày deploy | (điền ngày) |
+|---|---|
+| Public URL | https://day12-agent-7l68.onrender.com |
+| Platform | Render Blueprint |
+| Ngày deploy đầu tiên | 2026-09-28 |
+| Web service | `day12-agent` — Docker, Free, Oregon |
+| Redis-compatible store | `day12-redis` — Key Value, Free, Oregon |
+| Commit deploy đầu tiên | `e8fd6b4b88f71f2db21255dcbd846825fdbf4dc0` |
 
-## Biến Môi Trường Đã Set Trên Cloud
+## Cấu hình trên Render
 
-Ghi tên biến và **nguồn giá trị**, không ghi giá trị:
+| Biến | Nguồn |
+|---|---|
+| `PORT` | Render cấp tự động |
+| `AGENT_API_KEY` | Render tạo secret ngẫu nhiên từ Blueprint; không được lưu trong Git |
+| `REDIS_URL` | Connection string nội bộ của Key Value `day12-redis` |
+| `RATE_LIMIT_PER_MINUTE` | `10`, cấu hình trong Blueprint |
+| `MONTHLY_BUDGET_USD` | `10.0`, cấu hình trong Blueprint |
+| `LOG_LEVEL` | `INFO`, cấu hình trong Blueprint |
 
-| Biến | Đã set | Ghi chú |
-|------|--------|---------|
-| `PORT` | ✅ | platform tự gán |
-| `AGENT_API_KEY` | ✅ | đặt trong dashboard, không nằm trong repo |
-| `REDIS_URL` | ✅ | (điền: Redis add-on của platform / Upstash / ...) |
-| `RATE_LIMIT_PER_MINUTE` | ✅ | 10 |
-| `MONTHLY_BUDGET_USD` | ✅ | 10.0 |
-| `LOG_LEVEL` | ✅ | INFO |
+Blueprint đặt `autoDeployTrigger: off`; workflow gọi deploy hook sau khi test và build thành công, kèm SHA đã kiểm tra. Key Value Free chỉ lưu trong bộ nhớ, nên dữ liệu có thể mất khi Render khởi động lại datastore.
 
-## Lệnh Kiểm Tra
-
-Thay `<URL>` bằng Public URL ở trên:
+## Kiểm tra dịch vụ
 
 ```bash
-# 1. Liveness — mong đợi 200 {"status":"ok"}
-curl -i <URL>/health
-
-# 2. Readiness — mong đợi 200 {"status":"ready"} (đã nối được Redis)
-curl -i <URL>/ready
-
-# 3. Không có API key — mong đợi 401
-curl -i -X POST <URL>/ask \
+curl -i https://day12-agent-7l68.onrender.com/health
+curl -i https://day12-agent-7l68.onrender.com/ready
+curl -i -X POST https://day12-agent-7l68.onrender.com/ask \
   -H "Content-Type: application/json" \
   -d '{"question":"Hello"}'
-
-# 4. Có API key — mong đợi 200 kèm câu trả lời
-curl -i -X POST <URL>/ask \
-  -H "Content-Type: application/json" \
-  -H "X-API-Key: $AGENT_API_KEY" \
-  -H "X-User-Id: sv-test" \
-  -d '{"question":"Deploy là gì?"}'
-
-# 5. Rate limit — gọi 15 lần, những lần cuối phải trả 429
-for i in $(seq 1 15); do
-  curl -s -o /dev/null -w "%{http_code} " -X POST <URL>/ask \
-    -H "Content-Type: application/json" \
-    -H "X-API-Key: $AGENT_API_KEY" \
-    -H "X-User-Id: sv-test" \
-    -d '{"question":"test"}'
-done; echo
 ```
 
-## Kết Quả Chạy Thật
+Kết quả quan sát trong lần kiểm tra gần nhất:
 
-Dán output của các lệnh trên vào đây:
-
+```text
+GET /health -> 200 {"status":"ok","service":"day12-agent","version":"1.0.0"}
+GET /ready  -> 200 {"status":"ready","redis":true}
+POST /ask không có API key -> 401
 ```
-(điền output)
+
+CP5 chạy thật: **8 passed, 5 skipped**. Test HTTPS, health, Redis readiness, endpoint auth bắt buộc và tài liệu đều đạt. Test gọi `/ask` bằng khóa hợp lệ được bỏ qua trong lần chạy này vì khóa được Render tự sinh và chưa được đưa vào môi trường test cục bộ; không có khóa nào được ghi vào bằng chứng. Local smoke và JUnit nằm trong `evidence/render-smoke.txt`, `evidence/cp5-render.txt` và `evidence/cp5-render.xml`.
+
+Để chạy kiểm tra CP5 có xác thực, đặt secret của service vào biến môi trường cục bộ `DEPLOY_API_KEY` (giá trị này không được ghi vào file này hoặc commit), rồi chạy:
+
+```bash
+python -m pytest tests/test_cp5.py -v
 ```
 
-## Ảnh Chụp Màn Hình
+Test có xác thực tự bỏ qua nếu `DEPLOY_API_KEY` chưa được cấp cục bộ. Endpoint mock LLM không gọi nhà cung cấp AI bên ngoài.
 
-Đặt ảnh trong thư mục `screenshots/`:
+## Ảnh chụp màn hình
 
-- `screenshots/dashboard.png` — trang quản lý service trên platform
-- `screenshots/health.png` — kết quả gọi `/health` từ trình duyệt hoặc curl
-
----
-
-## Nếu Dùng Phương Án Dự Phòng
-
-Không đăng ký được tài khoản cloud? Vẫn nộp được bài, nhưng CP5 tối đa 60% điểm:
-
-1. Đặt `LOCAL_FALLBACK=true` trong `.env`
-2. Chạy `docker compose up -d` rồi kiểm tra `docker compose ps`
-3. Chụp màn hình vào `screenshots/`
-4. Chạy `pytest tests/test_cp5.py -v` — bộ test sẽ tự chuyển sang kiểm tra
-   `http://localhost:8000`
-5. Ghi rõ lý do không deploy được vào phần dưới đây:
-
-```
-(điền lý do nếu dùng phương án dự phòng, ngược lại xóa mục này)
-```
+Ảnh dashboard và kết quả HTTP sẽ được lưu dưới `screenshots/` sau khi hoàn tất kiểm tra.

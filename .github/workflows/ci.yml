@@ -36,4 +36,5 @@ jobs:
             echo "::notice::RENDER_DEPLOY_HOOK is not configured; deploy skipped."
             exit 0
           fi
-          curl --fail --silent --show-error -X POST "$RENDER_DEPLOY_HOOK"
+          curl --fail --silent --show-error --request POST --get \
+            --data-urlencode "ref=$GITHUB_SHA" "$RENDER_DEPLOY_HOOK"
