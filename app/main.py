@@ -139,6 +139,9 @@ def index():
     const send = document.querySelector('#send');
     const status = document.querySelector('#status');
     const answer = document.querySelector('#answer');
+    form.addEventListener('input', () => {
+      if (status.textContent !== 'Đang xử lý…') status.textContent = 'Key không được lưu trên trình duyệt.';
+    });
     form.addEventListener('submit', async (event) => {
       event.preventDefault();
       send.disabled = true;

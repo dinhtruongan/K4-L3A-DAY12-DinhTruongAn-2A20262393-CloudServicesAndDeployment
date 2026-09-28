@@ -14,6 +14,7 @@
 |---|---|
 | Public URL | https://day12-agent-7l68.onrender.com |
 | Landing page | https://day12-agent-7l68.onrender.com/ (Vietnamese guide; API docs at `/docs`) |
+| Web chat | Landing page includes a chat form; visitor enters their own `AGENT_API_KEY`; the browser sends it directly to `/ask` and does not persist it |
 | Platform | Render Blueprint |
 | Ngày deploy đầu tiên | 2026-09-28 |
 | Web service | `day12-agent` — Docker, Free, Oregon |
