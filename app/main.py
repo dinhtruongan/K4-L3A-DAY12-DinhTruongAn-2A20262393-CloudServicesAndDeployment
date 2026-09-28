@@ -84,7 +84,7 @@ def index():
     :root { color-scheme: dark; font-family: Inter, ui-sans-serif, system-ui, sans-serif; }
     * { box-sizing: border-box; }
     body { margin: 0; min-height: 100vh; display: grid; place-items: center; padding: 24px; color: #e5edf8; background: radial-gradient(ellipse at 15% 10%, #183b53 0, transparent 45%), #101827; }
-    main { width: min(720px, 100%); padding: clamp(28px, 6vw, 52px); border: 1px solid #2c4057; border-radius: 24px; background: #142235eF; box-shadow: 0 24px 80px #0006; }
+    main { width: min(780px, 100%); padding: clamp(24px, 5vw, 44px); border: 1px solid #2c4057; border-radius: 24px; background: #142235ef; box-shadow: 0 24px 80px #0006; }
     .tag { display: inline-block; padding: 7px 11px; border: 1px solid #275e55; border-radius: 999px; color: #7ee7bd; background: #12352e; font-size: 13px; }
     h1 { margin: 22px 0 12px; font-size: clamp(34px, 7vw, 56px); letter-spacing: -.04em; line-height: 1.03; }
     p { color: #adbed2; font-size: 17px; line-height: 1.65; }
@@ -94,6 +94,18 @@ def index():
     a:hover { filter: brightness(1.12); }
     code { color: #9fe6cd; font-family: ui-monospace, SFMono-Regular, Consolas, monospace; }
     .hint { padding: 14px 16px; border-left: 3px solid #71e4bc; border-radius: 4px 10px 10px 4px; background: #1a2c40; font-size: 14px; }
+    .chat { margin-top: 28px; padding: 20px; border: 1px solid #2c4057; border-radius: 16px; background: #101c2b; }
+    .chat h2 { margin: 0 0 6px; font-size: 20px; }
+    .chat p { margin: 0 0 16px; font-size: 14px; }
+    label { display: block; margin: 14px 0 7px; color: #c1d0e1; font-size: 13px; }
+    input, textarea { width: 100%; padding: 12px 13px; border: 1px solid #39536f; border-radius: 10px; outline: none; color: #e5edf8; background: #142235; font: inherit; }
+    input:focus, textarea:focus { border-color: #71e4bc; }
+    textarea { min-height: 84px; resize: vertical; }
+    .chat-actions { display: flex; flex-wrap: wrap; align-items: center; gap: 12px; margin-top: 12px; }
+    button { padding: 12px 17px; border: 0; border-radius: 10px; color: #09251e; background: #71e4bc; font: inherit; font-weight: 700; cursor: pointer; }
+    button:disabled { opacity: .6; cursor: wait; }
+    #status { color: #a9bdd2; font-size: 13px; }
+    #answer { display: none; white-space: pre-wrap; margin-top: 16px; padding: 15px; border-radius: 10px; color: #dce8f5; background: #1a2c40; line-height: 1.6; }
     footer { margin-top: 28px; color: #8296ad; font-size: 13px; }
   </style>
 </head>
@@ -107,9 +119,49 @@ def index():
       <a href="/health">Health</a>
       <a href="/ready">Readiness</a>
     </nav>
-    <p class="hint">Để gọi <code>POST /ask</code>, gửi header <code>X-API-Key</code> cùng câu hỏi JSON. API key được giữ bí mật trong cấu hình dịch vụ; không chia sẻ hoặc dán key lên trang web.</p>
+    <section class="chat" aria-labelledby="chat-title">
+      <h2 id="chat-title">Trò chuyện với AI Agent</h2>
+      <p>Agent demo chạy mock LLM offline. API key chỉ được giữ trong bộ nhớ trang này và gửi trực tiếp tới API của dịch vụ.</p>
+      <form id="chat-form">
+        <label for="api-key">API key</label>
+        <input id="api-key" type="password" autocomplete="off" placeholder="Nhập AGENT_API_KEY của bạn" required>
+        <label for="question">Câu hỏi</label>
+        <textarea id="question" maxlength="2000" placeholder="Ví dụ: Hãy giới thiệu về bạn" required></textarea>
+        <div class="chat-actions"><button id="send" type="submit">Gửi câu hỏi</button><span id="status" role="status">Key không được lưu trên trình duyệt.</span></div>
+      </form>
+      <div id="answer" aria-live="polite"></div>
+    </section>
+    <p class="hint">Bạn cũng có thể tích hợp trực tiếp qua <code>POST /ask</code>, header <code>X-API-Key</code> và JSON <code>{"question":"..."}</code>. API Docs ở nút phía trên.</p>
     <footer>Day 12 · Cloud Services and Deployment · FastAPI + Redis</footer>
   </main>
+  <script>
+    const form = document.querySelector('#chat-form');
+    const send = document.querySelector('#send');
+    const status = document.querySelector('#status');
+    const answer = document.querySelector('#answer');
+    form.addEventListener('submit', async (event) => {
+      event.preventDefault();
+      send.disabled = true;
+      status.textContent = 'Đang xử lý…';
+      answer.style.display = 'none';
+      try {
+        const response = await fetch('/ask', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', 'X-API-Key': document.querySelector('#api-key').value, 'X-User-Id': 'web-demo' },
+          body: JSON.stringify({ question: document.querySelector('#question').value })
+        });
+        const data = await response.json();
+        if (!response.ok) throw new Error(data.detail || `Request failed (${response.status})`);
+        answer.textContent = `${data.answer}\n\nLịch sử: ${data.history_length} tin nhắn · Chi phí mô phỏng: $${Number(data.cost_usd).toFixed(4)}`;
+        answer.style.display = 'block';
+        status.textContent = 'Đã nhận phản hồi.';
+      } catch (error) {
+        status.textContent = error.message === 'Invalid API key' ? 'API key không hợp lệ.' : error.message;
+      } finally {
+        send.disabled = false;
+      }
+    });
+  </script>
 </body>
 </html>"""
 

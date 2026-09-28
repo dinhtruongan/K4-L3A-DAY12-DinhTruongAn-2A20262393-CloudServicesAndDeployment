@@ -126,6 +126,9 @@ class TestHealthEndpoint:
         assert "Day 12" in response.text
         assert "/docs" in response.text
         assert "X-API-Key" in response.text
+        assert "Trò chuyện với AI Agent" in response.text
+        assert "type=\"password\"" in response.text
+        assert "localStorage" not in response.text
 
     def test_health_tra_ve_200(self, client):
         response = client.get("/health")
