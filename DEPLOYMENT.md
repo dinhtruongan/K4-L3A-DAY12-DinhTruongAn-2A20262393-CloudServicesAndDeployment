@@ -18,6 +18,9 @@
 | Web service | `day12-agent` — Docker, Free, Oregon |
 | Redis-compatible store | `day12-redis` — Key Value, Free, Oregon |
 | Commit deploy đầu tiên | `e8fd6b4b88f71f2db21255dcbd846825fdbf4dc0` |
+| Commit xác minh CI → Render | `68e265a3fb73a4b61e74bfed21db3b2d9ceb5f1c` |
+| Render deploy xác minh CI | `dep-dat64qbbc2fs73bbcop0` — Live |
+| GitHub Actions | [run 36424280082](https://github.com/dinhtruongan/K4-L3A-DAY12-DinhTruongAn-2A20262393-CloudServicesAndDeployment/actions/runs/36424280082) — success |
 
 ## Cấu hình trên Render
 
@@ -62,4 +65,4 @@ Test có xác thực tự bỏ qua nếu `DEPLOY_API_KEY` chưa được cấp c
 
 ## Ảnh chụp màn hình
 
-Ảnh dashboard và kết quả HTTP sẽ được lưu dưới `screenshots/` sau khi hoàn tất kiểm tra.
+Ảnh dashboard chưa được lưu trong repository; bằng chứng triển khai hiện là URL công khai, trạng thái Live trên dashboard và log HTTP đã khử secret trong `evidence/`.
