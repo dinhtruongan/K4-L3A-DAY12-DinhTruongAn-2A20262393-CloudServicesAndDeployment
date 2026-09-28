@@ -1,4 +1,4 @@
-# Hướng Dẫn Lab — K4 Level 3A, Ngày 12: Hạ Tầng Cloud & Deployment
+![1790580936269](image/LAB_GUIDE/1790580936269.png)![1790580948650](image/LAB_GUIDE/1790580948650.png)![1790580953143](image/LAB_GUIDE/1790580953143.png)![1790580954168](image/LAB_GUIDE/1790580954168.png)# Hướng Dẫn Lab — K4 Level 3A, Ngày 12: Hạ Tầng Cloud & Deployment
 
 > **Bài làm cá nhân.** Xem quy định và cách đặt tên repo ở [README.md](README.md).
 >

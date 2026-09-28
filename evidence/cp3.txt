@@ -1,9 +1,9 @@
-.............                                                            [100%]
+......................                                                   [100%]
 ============================== warnings summary ===============================
-tests/test_cp1.py::TestHealthEndpoint::test_health_tra_ve_200
+tests/test_cp3.py::TestAuthentication::test_khong_co_key_thi_401
   C:\Users\Administrator\AppData\Local\Programs\Python\Python313\Lib\site-packages\starlette\testclient.py:53: DeprecationWarning: The anyio.abc.BlockingPortal alias is deprecated, use anyio.from_thread.BlockingPortal instead.
     _PortalFactoryType = Callable[[], AbstractContextManager[anyio.abc.BlockingPortal]]
 
 -- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
-- generated xml file: C:\K4-L3A-DinhTruongAn-2A20262393-Cloud-Service-And-Deployment\evidence\cp1.xml -
-13 passed, 1 warning in 1.50s
+- generated xml file: C:\K4-L3A-DinhTruongAn-2A20262393-Cloud-Service-And-Deployment\evidence\cp3.xml -
+22 passed, 1 warning in 1.94s

@@ -9,10 +9,11 @@ services:
     runtime: docker
     dockerfilePath: ./Dockerfile
     plan: free
+    autoDeployTrigger: 'off'
     healthCheckPath: /health
     envVars:
       - key: AGENT_API_KEY
-        sync: false
+        generateValue: true
       - key: LOG_LEVEL
         value: INFO
       - key: RATE_LIMIT_PER_MINUTE
@@ -22,10 +23,10 @@ services:
       - key: REDIS_URL
         fromService:
           name: day12-redis
-          type: redis
+          type: keyvalue
           property: connectionString
 
-  - type: redis
+  - type: keyvalue
     name: day12-redis
     plan: free
     ipAllowList: []

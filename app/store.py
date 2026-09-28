@@ -9,6 +9,7 @@ nằm ở nơi mọi instance cùng nhìn thấy: Redis.
 from __future__ import annotations
 
 import json
+from functools import lru_cache
 
 import redis
 
@@ -25,7 +26,13 @@ def get_redis_client(url: str | None = None):
     Docker. Tiện cho lúc học, nhưng KHÔNG dùng khi deploy: nó vẫn là state
     trong process, đúng cái mà CP4 đang tìm cách loại bỏ.
     """
-    url = url or get_settings().redis_url
+    resolved_url = url or get_settings().redis_url
+    return _client_for_url(resolved_url)
+
+
+@lru_cache(maxsize=8)
+def _client_for_url(url: str):
+    """Reuse a client per URL so local fake:// providers share one store."""
     if url.startswith("fake://"):
         import fakeredis
 
@@ -51,7 +58,10 @@ class ConversationStore:
         Trả ``True`` nếu thành công, ``False`` nếu có bất kỳ Exception nào
         (mất mạng, sai mật khẩu, Redis chưa khởi động...).
         """
-        raise NotImplementedError("TODO (CP4): cài đặt ping")
+        try:
+            return bool(self.client.ping())
+        except Exception:
+            return False
 
     def append(self, user_id: str, role: str, content: str) -> None:
         """Ghi thêm một lượt vào lịch sử.
@@ -65,7 +75,10 @@ class ConversationStore:
           3. ``self.client.expire(key, HISTORY_TTL_SECONDS)`` — hội thoại cũ
              tự hết hạn, khỏi phải dọn tay.
         """
-        raise NotImplementedError("TODO (CP4): cài đặt append")
+        key = self._key(user_id)
+        self.client.rpush(key, json.dumps({"role": role, "content": content}, ensure_ascii=False))
+        self.client.ltrim(key, -HISTORY_MAX_MESSAGES, -1)
+        self.client.expire(key, HISTORY_TTL_SECONDS)
 
     def get_history(self, user_id: str) -> list[dict]:
         """Đọc lịch sử hội thoại, cũ nhất trước.
@@ -73,7 +86,7 @@ class ConversationStore:
         TODO (CP4): ``self.client.lrange(key, 0, -1)`` rồi ``json.loads``
         từng phần tử. Chưa có gì → trả về list rỗng.
         """
-        raise NotImplementedError("TODO (CP4): cài đặt get_history")
+        return [json.loads(item) for item in self.client.lrange(self._key(user_id), 0, -1)]
 
     def clear(self, user_id: str) -> None:
         """CHO SẴN — xóa lịch sử của một user."""

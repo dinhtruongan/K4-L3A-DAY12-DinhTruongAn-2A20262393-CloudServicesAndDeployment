@@ -3,16 +3,16 @@
     "C:\\Users\\Administrator\\AppData\\Local\\Programs\\Python\\Python313\\python.exe",
     "-m",
     "pytest",
-    "tests/test_cp1.py",
+    "tests/test_cp4.py",
     "-q",
-    "--junitxml=evidence/cp1.xml"
+    "--junitxml=evidence/cp4.xml"
   ],
-  "started_utc": "2026-09-28T09:37:14.604908+00:00",
-  "finished_utc": "2026-09-28T09:37:25.307576+00:00",
+  "started_utc": "2026-09-28T09:37:14.796980+00:00",
+  "finished_utc": "2026-09-28T09:37:25.378743+00:00",
   "revision": "fca40fd261bef20ffa9c894236cd49e574743a6e",
   "working_tree": " M .dockerignore\n M Dockerfile\n M LAB_GUIDE.md\n M README.md\n M app/auth.py\n M app/cost_guard.py\n M app/main.py\n M app/rate_limiter.py\n M app/store.py\n M docker-compose.yml\n M evidence/cp1.json\n M evidence/cp1.txt\n M evidence/cp1.xml\n",
   "python": "3.13.15",
   "platform": "Windows-11-10.0.26200-SP0",
   "exit_code": 0,
-  "output": "cp1.txt"
+  "output": "cp4.txt"
 }
